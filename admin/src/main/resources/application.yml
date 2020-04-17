@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active: test
+  thymeleaf:
+    cache: false
+    prefix: classpath:templates/
+server:
+  port: 8088
+
+es:
+  host: 192.168.101.219
+  port: 9200
+  scheme: http
+
+mybatis:
+  mapper-locations: classpath:mybatis/*Mapper.xml
+  type-aliases-package: com.jinhua.admin.entity

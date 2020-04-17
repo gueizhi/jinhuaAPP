@@ -1,0 +1,138 @@
+<div class="layui-form" lay-href="fsysargs/updateFsysargs" xmlns:th="http://www.thymeleaf.org" >
+    <div class="layuimini-main">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+            <legend>修改系统参数</legend>
+        </fieldset>
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">索引</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${fsysargs.fkey}" name="ftkey" lay-verify="number" autocomplete="off" placeholder="索引" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">参数类型</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${fsysargs.ftype}" name="ftype" lay-verify="number" autocomplete="off" placeholder="参数类型" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">参数值</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${fsysargs.fvalue}" name="fvalue" lay-verify="required" lay-reqtext="参数值" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">描述</label>
+                <div class="layui-input-block">
+                    <textarea th:text="${fsysargs.fdescripttion == null ? '':fsysargs.fdescripttion}" placeholder="请输入描述" name="fdescription" class="layui-textarea" ></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">版本</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${fsysargs.fversion}" name="fversion" lay-verify="required" lay-reqtext="版本" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">url</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${fsysargs.furl}" name="furl" lay-verify="required" lay-reqtext="url" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${fsysargs.fcreatetime}" name="fcreatetime" lay-verify="required" lay-reqtext="fcreatetime" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="demo1">保存提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , laydate = layui.laydate;
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        laydate.render({
+            elem: '#date1'
+        });
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function (value) {
+                if (value.length < 5) {
+                    return '标题至少得5个字符';
+                }
+            }
+            , pass: [
+                /^[\S]{6,12}$/
+                , '密码必须6到12位，且不能出现空格'
+            ]
+            , content: function (value) {
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function (data) {
+            layer.msg('开关checked：' + (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+            $.ajax({
+                url:'fsysargs/updateFsysargs',
+                type:'post',
+                data:data,
+                dataType:"html",
+                success:function(data){
+                    if(data){
+                        layer.alert("提交成功！")
+                    }
+                    else{
+                        layer.alert("提交失败！")
+                    }
+                },
+                error:function(e){
+                    layer.alert("提交失败！")
+                },
+
+            });
+            return false;
+        });
+
+        //表单初始赋值
+        form.val('example', {
+            "username": "" // "name": "value"
+            , "password": ""
+            , "interest": 1
+            , "like[write]": true //复选框选中状态
+            , "close": true //开关状态
+            , "sex": "女"
+            , "desc": "layui"
+        })
+    });
+</script>

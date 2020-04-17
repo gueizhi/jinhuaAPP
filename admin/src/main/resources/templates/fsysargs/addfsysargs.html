@@ -1,0 +1,109 @@
+<div class="layui-form" lay-href="security/updateSecurity" xmlns:th="http://www.thymeleaf.org" >
+    <div class="layuimini-main">
+
+        <div class="layui-form layuimini-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label required">参数名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fkey" lay-verify="required|fkey" lay-reqtext="参数名不能为空" placeholder="请输入参数名" value="" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">参数类型</label>
+                <div class="layui-input-block">
+                    <select name="ftype" lay-verify="required">
+                        <option  value="">请选择参数类型</option>
+                        <option value="1" >前端</option>
+                        <option value="2">后端</option>
+                        <option value="3" selected>通用</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">参数值</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fvalue" lay-verify="required" lay-reqtext="参数值不能为空" placeholder="请输参数值" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label ">版本</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fversion"  placeholder="请输入版本" value="" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label ">URL</label>
+                <div class="layui-input-block">
+                    <input type="text" name="furl"  placeholder="请输入URL" value="" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">描述</label>
+                <div class="layui-input-block">
+                    <textarea name="fdescripttion" placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ =layui.jquery;
+
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+
+            $.post('fsysargs/addFSysargs',data.field,function (data) {
+                if (data.code==200){
+                    layer.msg(data.msg);
+                    /*window.location.href = 'gotoURL?url=admin/admin';
+                    parent.location.reload();*/
+                    //执行数据重载
+                    table.reload('currentTableId', {
+                        url:'fsysargs/selectAllFSysargs'
+                        ,where:data.field,
+                    }, 'data');
+                    //关闭添加页面
+                    layer.closeAll('page');
+                }else {
+                    layer.msg(data.msg)
+                }
+            });
+
+        });
+
+
+        form.verify({
+            fkey: [
+                /^(?!\d+$)[\da-zA-Z]+$/
+                ,'参数名只能由字母或者数字组成，但不能全为数字'
+            ]
+
+
+        });
+
+    });
+
+
+</script>

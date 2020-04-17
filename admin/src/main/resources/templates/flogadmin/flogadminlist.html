@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>table</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container" xmlns:th="http://www.thymeleaf.org">
+    <div class="layuimini-main">
+        <input id="aaa" type="hidden" value="${list}">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">管理员姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="fusername" name="fusername" autocomplete="off"
+                                       class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="fname" name="fname" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-form">
+                                <label class="layui-form-label">管理员类型</label>
+                                <div class="layui-input-block">
+                                    <select name="fadmintype" lay-filter="aihao" id="fadmintype">
+                                        <option value=""></option>
+                                        <option value="1">超级管理员</option>
+                                        <option value="2">普通管理员</option>
+                                        <option value="3">临时管理员</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-form">
+                                <label class="layui-form-label">日志类型</label>
+                                <div class="layui-input-block">
+                                    <select name="ftype" lay-filter="aihao1" id="ftype">
+                                        <option value=""></option>
+                                        <option value="1">登录操作</option>
+                                        <option value="2">添加操作</option>
+                                        <option value="3">修改操作</option>
+                                        <option value="4">删除操作</option>
+                                        <option value="5">退出操作</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">开始日期</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="params[beginTime]" id="begin" type="text">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">结束日期</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="params[endTime]" id="end" type="text">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <div class="layui-btn-container" style="margin-top:10px;">
+            <button style="margin-bottom: 10px" class="layui-btn layui-btn-sm data-add-btn" id="export"> 导出数据</button>
+        </div>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit">查看</a>
+        </script>
+
+    </div>
+</div>
+<script src="../../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script>
+
+    layui.use(['form', 'table', 'util', 'laydate'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
+            laydate = layui.laydate,
+            util = layui.util,
+            layer = layui.layer;
+        //筛选头部更新
+        form.render();
+        //时间自定义格式
+        laydate.render({
+            elem: '#begin'
+            , format: 'yyyy-MM-dd'
+        });
+        laydate.render({
+            elem: '#end'
+            , format: 'yyyy-MM-dd'
+        });
+        table.render({
+            elem: '#currentTableId',
+            url: '/flogAdmin/selectLogAdminList',
+            cols: [
+                [
+                    {type: "checkbox", width: 50, fixed: "left"},
+                    {field: 'fid', width: 80, title: 'ID', sort: true},
+                    {field: 'fusername', width: 150, title: '管理员'},
+                    {field: 'fip', width: 200, title: 'Ip地址'},
+                    {field: 'fname', width: 150, title: '用户'},
+                    {
+                        field: 'ftype', width: 150, title: '类型', templet: function (d) {
+                            if (d.ftype == 1) {
+                                return "登录操作";
+                            } else if (d.ftype == 2) {
+                                return "添加操作";
+                            } else if (d.ftype == 3) {
+                                return "修改操作";
+                            } else if (d.ftype == 4) {
+                                return "删除操作";
+                            } else if (d.ftype == 5) {
+                                return "退出操作";
+                            }
+                        }
+                    },
+                    {
+                        field: 'fadmintype', width: 150, title: '管理员类型', templet: function (d) {
+                            if (d.fadmintype == 1) {
+                                return "超级管理员";
+                            } else if (d.fadmintype == 2) {
+                                return "普通管理员";
+                            } else if (d.fadmintype == 3) {
+                                return "临时管理员";
+                            }
+                        }
+                    },
+
+                    {
+                        field: 'fcreatetime',
+                        title: '操作时间',
+                        width: 180,
+                        sort: true,
+                        templet: function (d) {
+                            return util.toDateString(d.fcreatetime, "yyyy-MM-dd HH:mm:ss")
+                        }
+                    },
+                    {title: '操作', minWidth: 50, templet: '#currentTableBar', fixed: "right", align: "center"}
+                ]
+            ],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: true
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            //执行搜索重载
+            table.reload('currentTableId', {
+                where: data.field,
+                page: {
+                    curr: 1
+                }
+            }, 'data');
+        });
+
+        // 监听查看详情操作
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                $.post('/flogAdmin/selectLogAdmin/' + data.fid, function (rsp) {
+                    if (rsp.code == 0) {
+                        showView(rsp.fLogAdmin);
+                    }
+                }, 'json');
+            }
+        });
+
+        //导出操作
+        $('#export').on('click', function () {
+            var fusername = $('#fusername').val();
+            var fname = $('#fname').val();
+            var fadmintype = $("#fadmintype").val();
+            var ftype = $("#ftype").val();
+            var begin = $("#begin").val();
+            var end = $("#end").val();
+            window.location = "/flogAdmin/ExcelDownload?fusername=" + fusername + "&fname=" + fname + "&fadmintype=" + fadmintype + "&ftype=" + ftype + "&begin=" + begin + "&end=" + end;
+        });
+
+        //显示详情弹框
+        function showView(data) {
+            var editHtml = '<form id="form1" class="layui-form"  >\
+            <div style="margin-bottom: 10px;margin-top: 10px">\
+            </div>\
+                           <div class="layui-form-item" >\
+                             <label class="layui-form-label">管理员姓名</label>\
+                             <div class="layui-input-inline"  style="width: 380px">\
+                               <input type="text"   value="' + data.fusername + '" autocomplete="off"  class="layui-input" >\
+                             </div>\
+                           </div>\
+                           <div class="layui-form-item">\
+                             <label class="layui-form-label">操作Ip地址</label>\
+                             <div class="layui-input-inline"  style="width: 380px">\
+                               <input type="text"  value="' + data.fip + '"  autocomplete="off"  class="layui-input">\
+                             </div>\
+                           </div>\
+                           <div class="layui-form-item">\
+                             <label class="layui-form-label">用户名称</label>\
+                             <div class="layui-input-inline"  style="width: 380px">\
+                               <input type="text" value="' + data.fname + '" lay-verify="title" autocomplete="off"  class="layui-input">\
+                             </div>\
+                           </div>\
+                           <div class="layui-form-item">\
+                             <label class="layui-form-label">操作类型</label>\
+                             <div class="layui-input-inline"  style="width: 380px">\
+                               <input type="text" value="' + data.type + '" lay-verify="title" autocomplete="off"  class="layui-input">\
+                             </div>\
+                           </div>\
+                           <div class="layui-form-item">\
+                             <label class="layui-form-label">管理员类型</label>\
+                             <div class="layui-input-inline"  style="width: 380px">\
+                               <input type="text" value="' + data.admintype + '" lay-verify="title" autocomplete="off"  class="layui-input">\
+                             </div>\
+                           </div>\
+                           <div class="layui-form-item ">\
+                             <label class="layui-form-label">日志描述</label>\
+                             <div class="layui-input-inline" style="width: 380px;word-wrap : break-word;">\
+                               <textarea   autocomplete="off"   class="layui-textarea">' + data.fdata + '</textarea>\
+                             </div>\
+                           </div>\
+                           <div class="layui-form-item ">\
+                             <label class="layui-form-label">操作时间</label>\
+                             <div class="layui-input-inline"  style="width: 380px">\
+                               <input type="text"  value="' + util.toDateString(data.fcreatetime, "yyyy-MM-dd HH:mm:ss") + '"  autocomplete="off"  class="layui-input">\
+                             </div>\
+                           </div>\
+                       </form>';
+
+            layer.open({
+                type: 1,
+                title: '查看详情',
+                content: editHtml,
+                area: ['600px', '620px'],
+                btn: '关闭'
+            });
+        }
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,130 @@
+<style>
+    .layui-btn:not(.layui-btn-lg ):not(.layui-btn-sm):not(.layui-btn-xs) {height:34px;line-height:34px;padding:0 8px;}
+</style>
+<body>
+<div class="layuimini-container layuimini-page-anim">
+    <div class="layuimini-main">
+        <div>
+            <table id="munu-table" class="layui-table" lay-filter="munu-table"></table>
+        </div>
+    </div>
+</div>
+<!-- 操作列 -->
+<script type="text/html" id="auth-state">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add">新增</a>
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+    layui.use(['table', 'miniPage'], function () {
+        var $ = layui.jquery;
+        var table = layui.table;
+        var treetable = layui.treetable;
+        var miniPage = layui.miniPage;
+
+        // 渲染表格
+        layer.load(2);
+        table.render({
+            elem: '#munu-table',
+            url: 'fsysargs/list',
+            page: false,
+            cols: [ [
+                {type: 'numbers'},
+                {field: 'fkey', minWidth: 200, title: '索引'},
+                {field: 'ftype', title: '类型'},
+                {field: 'fvalue', title: '参数值'},
+                {field: 'fdescripttion', title: '描述'},
+                {field: 'fversion', title: '版本'},
+                {field: 'furl', title: 'url'},
+                {field: 'fcreatetime', title: '创建时间'},
+                {templet: '#auth-state', width: 160, align: 'center', title: '操作'}
+            ] ],
+            done: function () {
+                layer.closeAll('loading');
+            }
+        });
+
+        $('#btn-expand').click(function () {
+            treetable.expandAll('#munu-table');
+        });
+
+        $('#btn-fold').click(function () {
+            treetable.foldAll('#munu-table');
+        });
+
+        //监听工具条
+        table.on('tool(munu-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            //删除事件
+            if (layEvent === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                    $.ajax({
+                        url: "fsysargs/deleteFsysargsById",
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            fid: data.fid
+                        },
+                        success: function (e) {
+                            if (e.code == 0) {
+                                layer.msg(e.msg);
+                            } else {
+                                layer.msg(e.msg);
+                            }
+                        },
+                        error: function (e) {
+                            layer.msg(e);
+                        }
+                    })
+                });
+
+                //修改事件
+            } else if (layEvent === 'edit') {
+                var content = miniPage.getHrefContent('fsysargs/findFsysargsById?fid='+data.fid);
+                var openWH = miniPage.getOpenWidthHeight();
+
+                var index = layer.open({
+                    title: '编辑',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: [openWH[0] + 'px', openWH[1] + 'px'],
+                    offset: [openWH[2] + 'px', openWH[3] + 'px'],
+                    content: content,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+                layer.msg('修改' + data.id);
+
+                //添加事件
+            }else if (layEvent === 'add') {
+                $.ajax({
+                    url: "fsysargs/saveFsysargs",
+                    type: "POST",
+                    dataType: "json",
+                    data: data,
+                    success: function (e) {
+                        if (e.code == 0) {
+                            layer.msg(e.msg);
+                        } else {
+                            layer.msg(e.msg);
+                        }
+                    },
+                    error: function (e) {
+                        layer.msg(e);
+                    }
+                })
+            }
+
+        });
+    });
+</script>
+</body>
+</html>

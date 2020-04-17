@@ -1,0 +1,205 @@
+<div class="layuimini-container layuimini-page-anim">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style=" margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">标题</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="keywords" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon " ></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-sm data-add-btn" lay-event="add"> 添加提问 </button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit">更新</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table','miniPage','element','util'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
+            miniPage = layui.miniPage;
+            util=layui.util;
+
+        table.render({
+            elem: '#currentTableId',
+            url: 'question/getAllQuestion',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [ [
+                {field: 'fid', align: 'center',title: 'ID',width:50},
+                {field: 'ftitle', align: 'center', title: '标题'},
+                {field: 'fdescription',  align: 'center',title: '描述'},
+                {field: 'fcreatetime', align: 'center', title: '创建时间',width:190,templet: function (d) {
+                        return util.toDateString(d.fcreatetime, "yyyy-MM-dd HH:mm:ss")
+                    }},
+                {title: '操作',  toolbar: '#currentTableBar', fixed: "right", align: "center",width: 130}
+            ] ],
+
+            page: true,
+            request: {
+                pageName: 'page' // 页码的参数名称，默认：page
+                , limitName: 'size' //每页数据量的参数名，默认：limit
+            },
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            //执行搜索重载
+            table.reload('currentTableId', {
+                url:'question/findQuestion'
+                ,where:data.field,
+            }, 'data');
+
+            return false;
+        });
+        /**
+         * toolbar事件监听
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {   // 监听添加操作
+                var content = miniPage.getHrefContent('gotoURL?url=question/addQuestion');
+                var openWH = miniPage.getOpenWidthHeight();
+
+                var index = layer.open({
+                    title: '添加',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: [openWH[0]-10 + 'px', openWH[1]-10 + 'px'],
+                    offset: [openWH[2] + 'px', openWH[3] + 'px'],
+                    content: content,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+                var checkStatus = table.checkStatus('currentTableId');
+                var dataLength=checkStatus.data.length;
+                if(dataLength>0){
+                    layer.confirm('确定要删除吗?',function(index){
+                        var data=checkStatus.data; //获取选中行的数据
+                        var ids="";
+                        //layer.alert("数据"+JSON.stringify(data))
+                        $.each(data,function(index,item){
+                            if(index==0){
+                                ids+="ids="+item.fid;
+                            }else{
+                                ids+="&ids="+item.fid;
+                            }
+                        });
+                        //layer.alert("数据"+JSON.stringify(ids))
+                        $.post("/admin/batchDeleteFAdmin",ids,function(res){
+                            layer.msg(res.msg);
+                            //执行数据重载
+                            table.reload('currentTableId', {
+                                url:'admin/selectAll'
+                                ,where:data.field,
+                            }, 'data');
+                        });
+
+                    });
+                }else{
+                    layer.msg("请选中操作行")
+                }
+
+                //layer.alert(JSON.stringify(data));
+            }
+        });
+
+        /**
+         * 操作监听
+         * */
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if (layEvent === 'del') {
+                layer.confirm('确定删除问答吗？', function (index) {
+                    layui.jquery.ajax({
+                        url:'***'+data.fid,
+                        method:'POST',
+                        data:data.field,
+                        dataType:'json',
+                        success:function(res){
+                            if(res.code==200){
+                                layui.miniPage.refresh(layer);
+                                layer.msg(res.msg, { icon: 1, closeBtn: 0 }, function (index2) {
+                                });
+                            }
+                            else
+                            {
+                                layer.msg(res.msg, { icon: 2, closeBtn: 0 }, function (index2) {
+                                });
+                            }
+
+                            //layer.close(parent.layer.index);
+                        },
+                        error:function (data) {
+
+                        }
+                    });
+
+                    layer.close(index);
+                });
+                //layer.msg('删除' + data.id);
+            } else if (layEvent === 'edit') {
+                var content = miniPage.getHrefContent('quesation/getQuesation?fid='+data.fid);
+                var openWH = miniPage.getOpenWidthHeight();
+
+                var index = layer.open({
+                    title: '编辑',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: [openWH[0] + 'px', openWH[1] + 'px'],
+                    offset: [openWH[2] + 'px', openWH[3] + 'px'],
+                    content: content,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+                //layer.msg('修改' + data.id);
+            }
+        });
+        //监听表格复选框选择
+        /*table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });*/
+
+
+
+
+    });
+</script>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinhua.admin.dao.FadminMapper" >
+
+    <insert id="addFadmin"  parameterType="com.jinhua.admin.entity.Fadmin"  >
+        insert into fadmin (fname,fpassword,fusername,fstate,ftype,froleid,fcreatetime) values (#{fname},#{fpassword},#{fusername},#{fstate},#{ftype},#{froleId},#{fcreatetime});
+    </insert>
+
+    <delete id="delFadmin" parameterType="java.lang.Integer">
+        delete from fadmin where fid=#{fid};
+    </delete>
+    <update id="updateByIdFadmin" parameterType="java.lang.Integer">
+        update fadmin set fstate=#{fstate} where fid=#{fid};
+    </update>
+
+    <update id="updateFadmin" parameterType="com.jinhua.admin.entity.Fadmin">
+        update fadmin
+        <set>
+
+        <if test="fusername != null">fusername = #{fusername}, </if>
+
+        <if test="fpassword != null">fpassword = #{fpassword}, </if>
+
+        <if test="fname != null">fname = #{fname}, </if>
+
+        <if test="fstate != null">fstate = #{fstate}, </if>
+
+        <if test="ftype != null">ftype = #{ftype}, </if>
+
+        <if test="froleId != null">froleid = #{froleId}, </if>
+
+        </set>
+        where fid=#{fid}
+    </update>
+
+    <select id="findAllFadmin" resultType="com.jinhua.admin.entity.Fadmin">
+        select fid,fusername,fstate,ftype,fcreatetime from fadmin;
+    </select>
+
+    <select id="findByName" parameterType="java.lang.String" resultType="com.jinhua.admin.entity.Fadmin">
+        select * from fadmin where fname=#{fname}
+    </select>
+
+    <select id="findById" parameterType="java.lang.Integer" resultType="com.jinhua.admin.entity.Fadmin">
+        select * from fadmin where fid=#{fid}
+    </select>
+
+    <select id="findFadminList"  resultType="com.jinhua.admin.entity.Fadmin">
+        select fid,fname,fusername,fstate,ftype,froleId,fcreatetime from fadmin
+        <where>
+            <if test="fusername != null ">
+                AND fusername like concat('%',#{fusername},'%')
+            </if>
+        </where>
+    </select>
+
+    <delete id="batchDeleteFAdmin">
+        delete from fadmin where fid in (
+        <foreach collection="list" item="fid" separator=",">
+            #{fid}
+        </foreach>
+        )
+    </delete>
+
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinhua.admin.dao.FLogAdminMapper">
+    <resultMap type="FLogAdmin" id="FLogAdminResult">
+        <id property="fid" column="fid"/>
+        <result property="fadminid" column="fadminid"/>
+        <result property="fip" column="fip"/>
+        <result property="fuid" column="fuid"/>
+        <result property="ftype" column="ftype"/>
+        <result property="fadmintype" column="fadmintype"/>
+        <result property="fdata" column="fdata"/>
+        <result property="fcreatetime" column="fcreatetime"/>
+        <result property="fusername" column="fusername"/>
+        <result property="fname" column="fname"/>
+    </resultMap>
+
+    <sql id="selectLogAdmin">
+       select f.fid,a.fusername,f.fip,u.fname ,f.ftype,f.fadmintype,f.fdata,f.fcreatetime
+       from fLogAdmin f left join fadmin a  on f.fadminid = a.fid left join fuser  u on f.fuid = u.fid
+    </sql>
+
+    <insert id="insertLogAdmin" parameterType="FLogAdmin">
+		insert into fLogAdmin(fadminid, fip, fuid, ftype, fadmintype, fdata, fcreatetime)
+        values (#{fadminid}, #{fip}, #{fuid}, #{ftype}, #{fadmintype}, #{fdata}, sysdate())
+	</insert>
+
+    <select id="selectLogAdminList" parameterType="FLogAdmin" resultMap="FLogAdminResult">
+        <include refid="selectLogAdmin"/>
+        <where>
+            <if test="fusername != null and fusername !='' ">
+                AND a.fusername  like concat('%', #{fusername}, '%')
+            </if>
+            <if test="fname !=null and fname !='' ">
+                AND u.username like concat('%', #{fname}, '%')
+            </if>
+            <if test="fip != null and fip !='' ">
+                AND f.fip = #{fip}
+            </if>
+            <if test="ftype != null ">
+                AND f.ftype = #{ftype}
+            </if>
+            <if test="fadmintype != null ">
+                AND f.fadmintype = #{fadmintype}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(f.fcreatetime,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(f.fcreatetime,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+          order by f.fcreatetime desc
+    </select>
+
+    <select id="selectLogAdminById" parameterType="Integer" resultMap="FLogAdminResult">
+        <include refid="selectLogAdmin"/>
+        where f.fid = #{fid}
+    </select>
+
+
+</mapper>

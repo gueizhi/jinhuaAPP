@@ -1,0 +1,92 @@
+<div class="layui-form" lay-href="/fsysargs/saveFsysargs" xmlns:th="http://www.thymeleaf.org" >
+    <div class="layuimini-main">
+        <div class="layui-form layuimini-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label required">索引</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fkey" lay-verify="required" lay-reqtext="索引不能为空" placeholder="请输入索引" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">类型</label>
+                <div class="layui-input-block">
+                    <input type="text" name="ftype" lay-verify="required"  placeholder="请输入索引" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">参数值</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fvalue" placeholder="请输入参数值" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">描述</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fdescripttion" placeholder="请输入描述" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">版本</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fversion" placeholder="请输入版本" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">url</label>
+                <div class="layui-input-block">
+                    <input type="text" name="furl" placeholder="请输入url" value="" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.$;
+
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        //当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                url:'fsysargs/saveFsysargs',
+                type:'post',
+                data:data.field,
+                dataType:"html",
+                success:function (data) {
+                    if (data){
+                        layer.alert("提交成功！");
+                        layer.closeAll('page');
+
+                    }else {
+                        layer.alert("提交失败！");
+                    }
+                },
+                error:function (e) {
+                    layer.alert("提交失败！");
+                },
+
+            });
+            return false;
+
+        });
+
+    });
+
+
+</script>

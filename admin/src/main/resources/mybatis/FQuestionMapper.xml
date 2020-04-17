@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinhua.admin.dao.FQuestionMapper" >
+
+    <insert id="insert"  parameterType="com.jinhua.common.entity.Fquestion"  keyProperty="fid" useGeneratedKeys="true" >
+        insert into fquestion (ftitle,fdescription,ftype,fbastanid,fbastan,fpraise,fpv,fadminid,fuserid,fupdatetime,fcreatetime)
+        values (#{ftitle},#{fdescription},#{ftype},#{fbastanid},#{fbastan},#{fpraise},#{fpv},#{fadminid},#{fuserid},now(),now());
+    </insert>
+
+    <delete id="del" parameterType="Long">
+        delete from fquestion where fid=#{fid};
+    </delete>
+
+    <update id="update" parameterType="com.jinhua.common.entity.Fquestion">
+        update fquestion set ftitle=#{ftitle},fdescription=#{fdescription},
+        ftype=#{ftype},fbastanid=#{fbastanid},fbastan=#{fbastan},fpraise=#{fpraise},
+        fpv=#{fpv},fupdatetime=now()
+         where fid=#{fid};
+    </update>
+
+
+    <select id="findByKewords"  parameterType="com.jinhua.common.entity.Fquestion" >
+        select fid,ftitle,fdescription,ftype,fbastanid,fbastan,fpraise,fpv,fadminid,fuserid,fupdatetime,fcreatetime
+         from fquestion;
+    </select>
+
+    <select id="findById" parameterType="Long" resultType="com.jinhua.common.entity.Fquestion">
+        select fid,ftitle,fdescription,ftype,fbastanid,fbastan,fpraise,fpv,fadminid,fuserid,fupdatetime,fcreatetime from fquestion where fid=#{fid}
+    </select>
+
+    <select id="selectAll"  resultType="com.jinhua.common.entity.Fquestion">
+        select fid,ftitle,fdescription,ftype,fbastanid,fbastan,fpraise,fpv,fadminid,fuserid,fupdatetime,fcreatetime
+         from fquestion
+    </select>
+
+</mapper>

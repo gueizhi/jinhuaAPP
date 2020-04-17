@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<body>
+        <ui class="layui-nav layui-nav-tree layui-left-nav-tree layui-this" id="LAY-system-side-menu" th:fragment="left_menu">
+
+            <li class="layui-nav-item menu-li">
+                <a class="" target="_self" href="javascript:;">
+                    <i class="fa fa-home">
+                        <span class="layui-left-nav">用户管理</span>
+                        <span class="layui-nav-more"></span>
+                    </i>
+                </a>
+            <dl class="layui-nav-child">
+                <dd class="menu-dd">
+                    <a href="javascript:;"  layuimini-href="gotoURL?url=fuser/userManager" target="_self">
+                        <i class="layui-icon layui-icon-user"></i>
+                        <span class="layui-left-nav">用户列表(非正式)</span>
+                    </a>
+                </dd>
+                <dd class="menu-dd">
+                    <a href="javascript:;"  layuimini-href="gotoURL?url=fuser/fuser" target="_self">
+                        <i class="layui-icon layui-icon-user"></i>
+                        <span class="layui-left-nav">用户列表</span>
+                    </a>
+                </dd>
+            </dl>
+
+            </li>
+            <li class="layui-nav-item menu-li">
+            <a class="" target="_self" href="javascript:;">
+                <i class="fa fa-home">
+                    <span class="layui-left-nav">管理员管理</span>
+                    <span class="layui-nav-more"></span>
+                </i>
+            </a>
+            <dl class="layui-nav-child">
+                <dd class="menu-dd">
+                    <!--<dd class="menu-dd" shiro:hasPermission="admin/test2.html">-->
+
+                    <a href="javascript:;" layuimini-href="gotoURL?url=admin/admin"  target="_self">
+                        <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+                        <span class="layui-left-nav "> 管理员管理</span>
+                    </a>
+                    <!--</dd>-->
+                </dd>
+                <!-- 以下是权限管理菜单 -->
+                <dd class="menu-dd">
+                    <a href="javascript:;" layuimini-href="gotoURL?url=security/securityList" target="_self">
+                        <i class="fa fa-tachometer"></i>
+                        <span class="layui-left-nav">权限管理</span>
+                    </a>
+                </dd>
+                <dd class="menu-dd" >
+                    <a href="javascript:;" layuimini-href="roleList" target="_self">
+                        <i class="fa fa-tachometer"></i>
+                        <span class="layui-left-nav">角色管理</span>
+                    </a>
+                </dd>
+                <dd class="menu-dd">
+                    <a href="javascript:; " layuimini-href="gotoURL?url=fsysargs/list" target="_self">
+                        <i class="fa fa-cog" aria-hidden="true"></i>
+                        <span class="layui-left-nav">系统参数</span>
+                    </a>
+                </dd>
+            </dl>
+        </li>
+            <li class="layui-nav-item menu-li">
+                <a class="" target="_self" href="javascript:;">
+                    <i class="fa fa-home">
+                        <span class="layui-left-nav">日志管理</span>
+                        <span class="layui-nav-more"></span>
+                    </i>
+                </a>
+                <dl class="layui-nav-child">
+
+                    <dd class="menu-dd">
+                        <a href="javascript:;" layuimini-href="gotoURL?url=/flogadmin/flogadminlist" target="_self">
+                            <i class=" fa fa-bars"></i>
+                            <span class="layui-left-nav">管理员日志列表</span>
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item menu-li">
+                <a class="" target="_self" href="javascript:;">
+                    <i class="fa fa-home">
+                        <span class="layui-left-nav">问答管理</span>
+                        <span class="layui-nav-more"></span>
+                    </i>
+                </a>
+                <dl class="layui-nav-child">
+
+                    <dd class="menu-dd">
+                        <a href="javascript:;" layuimini-href="gotoURL?url=/question/quList" target="_self">
+                            <i class=" fa fa-bars"></i>
+                            <span class="layui-left-nav">问答列表</span>
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ui>
+
+</body>
+</html>

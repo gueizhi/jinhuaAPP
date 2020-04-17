@@ -1,0 +1,155 @@
+<div class="layui-form" lay-href="security/updateSecurity" xmlns:th="http://www.thymeleaf.org" >
+    <div class="layuimini-main">
+
+        <div class="layui-form layuimini-form">
+            <div class="layui-form-item">
+
+                <div class="layui-input-block">
+                    <input type="text" name="fid" style="display:none"  th:value="${fadmin.fid}" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">用户名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fname" lay-verify="required|username" lay-reqtext="用户名不能为空"  th:value="${fadmin.fname}" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label ">密码</label>
+                <div class="layui-input-block">
+                    <input type="password" name="fpassword" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">姓名</label>
+                <div class="layui-input-block">
+                    <input  name="fusername" lay-verify="required" lay-reqtext="姓名不能为空"  th:value="${fadmin.fusername}" class="layui-input">
+                </div>
+            </div>
+            <!--用户状态开关-->
+            <div class="layui-form-item">
+                <label class="layui-form-label required" >用户状态</label>
+                <div class="layui-input-block"th:switch="${fadmin.fstate}">
+                    <input name="fstate" id="fstate" value="" type="hidden" />
+                    <input type="checkbox" th:case="1" value="1" checked="checked" lay-skin="switch" lay-filter="switchTest" lay-text="开启|关闭">
+                    <input type="checkbox" th:case="0" value="0"   lay-skin="switch" lay-filter="switchTest" lay-text="开启|关闭">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">管理员类型</label>
+                <div class="layui-input-block">
+                    <select name="ftype" lay-verify="required">
+                        <option  value="" >请选择管理员类型</option>
+                        <option value="1" th:selected="${1 == fadmin.ftype}">超级管理员</option>
+                        <option value="2" th:selected="${2 == fadmin.ftype}">系统管理员</option>
+                        <option value="3" th:selected="${3 == fadmin.ftype}">普通管理员</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">管理员角色</label>
+                <div class="layui-input-block">
+                    <select name="froleId" lay-verify="required">
+                        <option value="">请选择管理员角色</option>
+                        <option th:each="froleList : ${froleList}"  th:value="${froleList.fid}" th:text="${froleList.fname}" th:selected="${froleList.fid == fadmin.froleId}"></option>
+
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ =layui.jquery;
+
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            if(!testPass(data.field.fpassword))
+            {
+                layer.msg('密码至少8个字符，至少1个大写字母，1个小写字母和1个数字');
+                return false;
+            }
+            $.post('admin/editFAdmin',data.field,function (data) {
+
+                if (data.code==200){
+                    layer.msg(data.msg);
+                    /*window.location.href = 'gotoURL?url=admin/admin';
+                    parent.location.reload();*/
+                    //执行数据重载
+                    table.reload('currentTableId', {
+                        url:'admin/selectAll'
+                        ,where:data.field,
+                    }, 'data');
+                    //关闭修改页面
+                    layer.closeAll('page');
+                }else {
+                    layer.msg(data.msg)
+                }
+            });
+
+
+        });
+        form.verify({
+            username: [
+                /^[a-zA-Z0-9]{5,}$/
+                ,'用户名至少5个字符，有且只能有字母和数字组成'
+            ]
+                /*function(value, item){ //value：表单的值、item：表单的DOM对象
+                if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+                    return '用户名不能有特殊字符';
+                }
+                if(/(^\_)|(\__)|(\_+$)/.test(value)){
+                    return '用户名首尾不能出现下划线\'_\'';
+                }
+                if(/^\d+\d+\d$/.test(value)){
+                    return '用户名不能全为数字';
+                }
+            }*/,
+            pass: [
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+                ,'密码至少8个字符，至少1个大写字母，1个小写字母和1个数字'
+            ]
+
+            //我们既支持上述函数式的方式，也支持下述数组的形式
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            $('#fstate').val(this.checked ? '1' : '0');
+        });
+
+    });
+    function testPass(thePass) {
+        var rule=/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+        if(thePass==null || thePass.length==0)
+            return true;
+        if(thePass.match(rule)==null)
+        {
+            return false;
+        }
+        return true;
+    }
+
+</script>

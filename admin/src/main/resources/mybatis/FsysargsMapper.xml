@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinhua.admin.dao.FsysargsMapper" >
+    <resultMap type="com.jinhua.admin.entity.Fsysargs" id="BaseResultMap">
+        <id property="fid" column="fid"/>
+        <result property="fkey" column="fkey"/>
+        <result property="ftype" column="ftype"/>
+        <result property="fvalue" column="fvalue"/>
+        <result property="fdescripttion" column="fdescripttion"/>
+        <result property="fversion" column="fversion"/>
+        <result property="furl" column="furl"/>
+        <result property="fcreatetime" column="fcreatetime"/>
+    </resultMap>
+
+    <sql id="selectSysArgs">
+        fid,fkey,ftype,fvalue,fdescripttion,fversion,furl,fcreatetime
+    </sql>
+
+    <insert id="saveFsysargs" parameterType="com.jinhua.admin.entity.Fsysargs">
+		insert into fsysargs(
+		fkey,
+		ftype,
+		fvalue,
+		fdescripttion,
+		fversion,
+		furl,
+		fcreatetime
+		)values (
+		#{fkey},
+		#{ftype},
+		#{fvalue},
+		#{fdescripttion},
+		#{fversion},
+		#{furl},
+		#{fcreatetime})
+	</insert>
+
+    <select id="findAllFsysargs"  resultMap="BaseResultMap">
+       select <include refid="selectSysArgs"/> from fsysargs
+    </select>
+
+    <select id="findFsysargsById" parameterType="Integer" resultMap="BaseResultMap">
+        select <include refid="selectSysArgs"/> from fsysargs where fid = #{fid}
+    </select>
+
+    <delete id="deleteFsysargsById" parameterType="Integer">
+        delete from fsysargs where fid=#{fid}
+    </delete>
+
+    <update id="updateFsysargs" parameterType="com.jinhua.admin.entity.Fsysargs">
+        update fsysargs
+           <set>
+            <if test="fkey != null and fkey !=''">
+                fkey = #{fkey},
+            </if>
+            <if test="ftype!= null and ftype !=''">
+                ftype = #{ftype},
+            </if>
+            <if test="fvalue != null and fvalue !=''">
+                fvalue = #{fvalue},
+            </if>
+            <if test="fdescripttion != null and fdescripttion !=''">
+                fdescripttion = #{fdescripttion},
+            </if>
+            <if test="fversion != null and fversion !=''">
+                fversion = #{fversion},
+            </if>
+            <if test=" furl != null and furl !=''">
+                furl = #{furl},
+            </if>
+            <if test=" fcreatetime != null and fcreatetime !=''">
+                fcreatetime = #{fcreatetime},
+            </if>
+        </set>
+        where fid = #{fid}
+    </update>
+
+    <select id="findFSysargsList"  resultType="com.jinhua.admin.entity.Fsysargs">
+        select <include refid="selectSysArgs"/> from fsysargs
+        <where>
+            <if test="fkey != null ">
+                AND fkey like concat('%',#{fkey},'%')
+            </if>
+        </where>
+    </select>
+    <select id="findByKey" parameterType="java.lang.String" resultType="com.jinhua.admin.entity.Fsysargs">
+        select <include refid="selectSysArgs"/> from fsysargs where fkey=#{fkey}
+
+    </select>
+
+</mapper>

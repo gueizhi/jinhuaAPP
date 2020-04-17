@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinhua.admin.dao.FRoseMapper" >
+
+  <resultMap id="BaseResultMap" type="com.jinhua.admin.entity.FRole" >
+    <id column="fid" property="fid" jdbcType="INTEGER" />
+    <result column="fdescription" property="fdescription" jdbcType="VARCHAR" />
+    <result column="fname" property="fname" jdbcType="VARCHAR" />
+    <collection property="froleSecurities" ofType="com.jinhua.service.admin.entity.FRoleSecurity" column="fid" select="com.jinhua.service.admin.dao.FRoleSecurityMapper.selectByRoleId" />
+  </resultMap>
+
+  <insert id="insert" parameterType="com.jinhua.admin.entity.FRole" keyProperty="fid">
+    insert into fRole (fdescription, fname
+      )
+    values (#{fdescription,jdbcType=VARCHAR}, #{fname,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <select id="selectByPrimaryKey"  resultMap="BaseResultMap" resultType="java.lang.Integer">
+    select fid, fdescription, fname
+    from fRole
+    where fid = #{fid,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select fid, fdescription, fname
+    from fRole
+  </select>
+
+  <update id="updateByPrimaryKey" parameterType="com.jinhua.admin.entity.FRole" >
+    update fRole
+    set fdescription = #{fdescription,jdbcType=VARCHAR},
+      fname = #{fname,jdbcType=VARCHAR}
+    where fid = #{fid,jdbcType=INTEGER}
+  </update>
+</mapper>

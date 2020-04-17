@@ -1,0 +1,107 @@
+<div class="layuimini-main">
+
+    <div class="layui-form layuimini-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">标题</label>
+            <div class="layui-input-block">
+                <textarea name="ftitle"  lay-verify="required" lay-reqtext="标题不能为空" class="layui-textarea" placeholder="请输入标题"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">描述</label>
+            <div class="layui-input-block">
+                <textarea name="fdescription"  lay-verify="required" lay-reqtext="描述不能为空" class="layui-textarea" placeholder="请输入描述"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">推荐类型</label>
+            <div class="layui-input-block">
+                <input type="radio" name="ftype" value="1" title="正常" checked="checked">
+                <input type="radio" name="ftype" value="2" title="推荐">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">赞数量</label>
+            <div class="layui-input-block" style="width: 80px;">
+                <input type="number" name="fpraise"  value="0" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">浏览量</label>
+            <div class="layui-input-block" style="width: 80px;">
+                <input type="number" name="fpv"  value="0" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" >
+            <label class="layui-form-label required">最佳回答ID</label>
+            <div class="layui-input-block" style="width: 80px;">
+                <input type="number" name="fbastanid"  value="0" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">最佳回答</label>
+            <div class="layui-input-block">
+                <textarea name="fbastan" class="layui-textarea" placeholder="请输入最佳回答信息"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.$;
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            layui.jquery.ajax({
+                url:'question/addQuestion',
+                method:'POST',
+                data:data.field,
+                dataType:'json',
+                success:function(res){
+                    if(res.code==200){
+                        //parent.closeIframe(res.msg);
+                        layer.alert(res.msg, { icon: 1, closeBtn: 0 }, function (index) {
+                            //关闭弹窗
+                            //layer.close(index);
+                            layui.miniPage.refresh(parent.layer);
+                            layer.closeAll();
+                        });
+                    }
+                    else
+                    {
+                        layer.alert(res.msg, { icon: 2, closeBtn: 0 }, function (index) {
+                            //关闭弹窗
+                            //layer.close(index);
+                            layui.miniPage.refresh(parent.layer);
+                            layer.closeAll();
+                        });
+                    }
+
+                    //layer.close(parent.layer.index);
+                },
+                error:function (data) {
+
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
